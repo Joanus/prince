@@ -3,629 +3,261 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>小王子：星際守護之旅｜互動敘事 RPG（自然清新風）</title>
+<title>遊戲模板啟動器</title>
 <style>
   :root{
-    --bg:#f6fbf7;
-    --card:#ffffffee;
-    --ink:#2f3e2c;
-    --muted:#6b7f6b;
-    --accent:#6ac196;       /* 自然綠 */
-    --accent-2:#89d6c9;     /* 水色 */
-    --accent-3:#ffd27f;     /* 柔暖陽光 */
-    --danger:#e26d6d;       /* 風險警示 */
-    --leaf:#cfead8;
-    --shadow: 0 12px 30px rgba(79,114,96,.18);
-    --radius:16px;
+    --bg:#0b1020; --panel:#131a2e; --ink:#e9ecf5; --muted:#9fb0d6;
+    --accent:#6ad1ff; --ok:#66e3a0; --warn:#ffd36a; --danger:#ff6b6b;
   }
-  html,body{height:100%}
-  body{
-    margin:0; font-family: "Noto Serif TC", "PingFang TC", "Hiragino Sans", "Microsoft JhengHei", serif;
-    color:var(--ink); background: radial-gradient(1200px 900px at 20% -10%, #e5f7ef 0%, transparent 60%), radial-gradient(1000px 700px at 120% 10%, #e7fafc 0%, transparent 60%), var(--bg);
-    overflow-x:hidden;
-  }
-  /* 背景裝飾：葉與星 */
-  .decor{
-    position:fixed; inset:0; pointer-events:none; z-index:-1;
-    background:
-      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><g fill="%23cfead8" opacity=".6"><circle cx="20" cy="40" r="2"/><circle cx="200" cy="30" r="1.5"/><circle cx="260" cy="120" r="2"/><circle cx="140" cy="200" r="1.8"/></g></svg>') repeat;
-    mix-blend-mode:multiply;
-    animation: twinkle 6s ease-in-out infinite;
-  }
-  @keyframes twinkle{
-    0%,100%{opacity:.5} 50%{opacity:.9}
-  }
-  .wrap{
-    max-width:980px; margin: clamp(12px,4vw,32px) auto;
-    padding: clamp(12px,2vw,24px);
-  }
-  .card{
-    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
-    overflow: hidden; border: 1px solid #e7f2ea;
-  }
-  header{
-    padding: 22px 24px; display:flex; gap:16px; align-items:center; background:linear-gradient(180deg, #f4fff7 0%, #fff 60%);
-    border-bottom: 1px solid #e7f2ea;
-  }
-  .logo{
-    width:52px; height:52px; border-radius:14px; background: conic-gradient(from 30deg, var(--accent), var(--accent-2), var(--accent-3));
-    position:relative; box-shadow: 0 10px 20px rgba(106,193,150,.25) inset, 0 4px 10px rgba(0,0,0,.06);
-  }
-  .logo:after{
-    content:""; position:absolute; inset:10px; border-radius:12px; background: radial-gradient(circle at 60% 40%, #fff8 0 40%, transparent 42%);
-  }
-  h1{font-size: clamp(20px, 2.6vw, 28px); margin:0}
-  .sub{color:var(--muted); font-size: clamp(12px,1.6vw,14px)}
-  main{display:grid; grid-template-columns: 1.1fr .9fr; gap:20px; padding: 18px 20px 24px}
-  @media (max-width: 860px){
-    main{grid-template-columns: 1fr}
-  }
-  .scene{
-    background:#fff; border-radius: 14px; padding: 18px; border:1px solid #eef6f0; position:relative; overflow:hidden;
-  }
-  .scene:before{
-    content:""; position:absolute; inset:-30px -30px auto auto; width:180px; height:180px; border-radius:50%;
-    background: radial-gradient(closest-side, #fff9e6, transparent 70%); opacity:.6; filter: blur(1px);
-  }
-  .scene h2{margin: 6px 0 8px 0; font-size: 18px}
-  .scene .text{line-height:1.7; font-size: 16px}
-  .choices{display:grid; gap:10px; margin-top:14px}
-  .choice{font-size: 16px; /* 調大字體 */; 
-    border:1px solid #dff0e6; background: linear-gradient(180deg,#f8fffb,#fefefe);
-    padding:12px 14px; border-radius:12px; cursor:pointer; transition:.2s transform, .2s box-shadow;
-  }
-  .choice:hover{transform: translateY(-1px); box-shadow: 0 10px 18px rgba(87,140,111,.12)}
-  .choice small{display:block; color: var(--muted); margin-top:4px}
-  .pill{
-    display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:#ecfbf3; color:#2f6b4a; font-size:12px; border:1px solid #d8f1e2; margin-right:6px
-  }
-  .right{
-    background:#fff; border:1px solid #eef6f0; border-radius:14px; padding:14px; position:relative;
-  }
-  .meter{display:grid; gap:10px}
-  .bar{
-    background:#f2faf5; border:1px solid #e3f2ea; border-radius:999px; height:14px; position:relative; overflow:hidden;
-  }
-  .bar>span{
-    position:absolute; left:0; top:0; bottom:0; width:0%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    box-shadow: inset 0 -8px 12px rgba(255,255,255,.35);
-    transition: width .45s ease;
-  }
-  .bar .cap{position:absolute; right:6px; top:50%; transform:translateY(-50%); color:#608a6e; font-size:12px}
-  .label{display:flex; align-items:center; justify-content:space-between; color:#56735f; font-size:13px}
-  .tags{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px}
-  .note{color:#6c8371; background:#f4fbf7; border:1px dashed #cfead8; border-radius:10px; padding:10px 12px; font-size:13px}
-  footer{padding:14px 20px; display:flex; gap:10px; align-items:center; justify-content:space-between; border-top:1px solid #e7f2ea}
-  .btn{
-    border:0; background: linear-gradient(180deg, #6ac196, #52b184);
-    color:white; padding:10px 16px; border-radius:12px; cursor:pointer; box-shadow: 0 8px 18px rgba(106,193,150,.3);
-    display:inline-flex; align-items:center; gap:8px; font-weight:700; letter-spacing:.03em
-  }
-  .btn:disabled{opacity:.5; cursor:not-allowed; box-shadow:none}
-  .ghost{background:#ffffff; color:#2f6b4a; border:1px solid #cfead8; box-shadow:none}
-  .fade-in{animation: fade .35s ease}
-  @keyframes fade{from{opacity:.2; transform:translateY(6px)} to{opacity:1; transform:none}}
-  .toast{
-    position:fixed; right:16px; bottom:16px; background:#fff; border:1px solid #cfead8; box-shadow: var(--shadow); padding:10px 12px; border-radius:12px; color:#397455; font-size:14px;
-    transform: translateY(20px); opacity:0; pointer-events:none;
-  }
-  .toast.show{opacity:1; transform: translateY(0)}
-  /* 結局視圖 */
-  .ending{
-    display:none; padding: 22px; background: linear-gradient(180deg, #f7fff9, #fff);
-  }
-  .ending h2{font-size: 22px; margin:4px 0 8px}
-  .ending .badge{
-    display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid #dff0e6; border-radius:999px; background:#f0fbf6; color:#2a6a4b; font-weight:700
-  }
-  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-  @media (max-width:720px){.grid-2{grid-template-columns:1fr}}
-  .recap{background:#ffffff; border:1px solid #eef6f0; border-radius:14px; padding:12px}
-  .chip{display:inline-block; background:#eef8f2; color:#396c51; border:1px solid #d8efe3; padding:4px 10px; border-radius:999px; font-size:12px; margin: 3px 5px 0 0}
-  .warn{color:#a33; background:#fff4f4; border:1px solid #f3d1d1}
-  /* 小動畫：選擇回饋 */
-  .spark{
-    position:absolute; inset:auto auto 10px 10px; font-size:12px; color:#2f6b4a; opacity:0; transform: translateY(6px);
-  }
-  .spark.show{opacity:1; transform:none; transition:.6s ease; }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#0e1630);}
+  body{font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, "PingFang TC", "Microsoft JhengHei", sans-serif; color:var(--ink); display:flex; align-items:center; justify-content:center; padding:20px;}
+  .shell{width:min(920px,100%); background:rgba(19,26,46,.8); border:1px solid #1f2a4a; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,.35); overflow:hidden;}
+  header{padding:18px 20px; border-bottom:1px solid #1f2a4a; display:flex; gap:10px; align-items:center; justify-content:space-between;}
+  header h1{font-size:18px; margin:0; letter-spacing:.5px}
+  header .meta{font-size:13px; color:var(--muted)}
+  main{padding:18px;}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px}
+  button{background:#1a2444; color:var(--ink); border:1px solid #2a3968; padding:10px 14px; border-radius:12px; cursor:pointer}
+  button:hover{background:#1f2b52}
+  .pill{font-size:12px; padding:6px 10px; border-radius:999px; background:#19213e; border:1px solid #2a3968; color:var(--muted)}
+  .grid{display:grid; gap:12px}
+  .center{display:flex; align-items:center; justify-content:center}
+  .card{background:#101733; border:1px solid #1f2a4a; border-radius:12px; padding:14px}
+  .big{font-size:24px; text-align:center}
+  /* Puzzle (memory) */
+  .board{display:grid; gap:10px; justify-content:center}
+  .tile{width:72px; height:72px; background:#121b3a; border:1px solid #2a3968; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer; transform:translateZ(0); transition:transform .12s}
+  .tile.revealed{background:#1a2448}
+  .tile.matched{background:#173a2a; border-color:#2d5b47}
+  /* Riddle */
+  .riddle-q{font-weight:700; margin-bottom:8px}
+  .choice{padding:10px 12px; border-radius:10px; border:1px solid #2a3968; cursor:pointer; margin:6px 0; background:#141c3a}
+  .choice.correct{outline:2px solid var(--ok)}
+  .choice.wrong{outline:2px solid var(--danger)}
+  /* Story */
+  .story{line-height:1.7}
+  .story .opt{margin-top:10px}
+  /* Relax */
+  .bubble{width:220px; height:220px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #7fe4ff, #215a86); box-shadow:0 0 40px rgba(106,209,255,.4) inset, 0 0 24px rgba(106,209,255,.3)}
+  .hint{color:var(--muted); font-size:14px; text-align:center; margin-top:10px}
+  .footer{padding:14px 20px; border-top:1px solid #1f2a4a; display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:12px}
+  .hidden{display:none!important}
 </style>
 </head>
 <body>
-<div class="decor" aria-hidden="true"></div>
-<div class="wrap">
-  <div class="card">
-    <header>
-      <div class="logo" aria-hidden="true"></div>
-      <div>
-        <h1>小王子：星際守護之旅</h1>
-        <div class="sub">自然清新｜奇幻治癒｜標準篇幅 — 在選擇之間，看見「風險與準備」的光。</div>
-        <div class="tags" id="tags">
-          <span class="pill">好奇之星</span>
-          <span class="pill">洞察之光</span>
-          <span class="pill">守護之種</span>
-          <span class="pill">心靈暖度</span>
-        </div>
-      </div>
-    </header>
-    <main>
-      <section class="scene fade-in">
-        <h2 id="scene-title">序章・B612 的清晨</h2>
-        <div id="scene-text" class="text">
-          小王子在自己的小行星上醒來，露珠在玫瑰的花瓣上顫抖。遠方雲層堆起，一場季風正悄悄靠近。他想再次啟程拜訪群星，但玫瑰任性地說不冷也不怕風。小王子看著只有三座火山與半截風鈴，心裡知道旅途總有意外：風、沙、迷途與分別。他摸了摸口袋裡的繩結與畫著星圖的小本子，思索該先做些什麼，再離開。
-        </div>
-        <div class="choices" id="choices">
-          <!-- choices injected by JS -->
-        </div>
-        <div class="spark" id="spark"></div>
-      </section>
-      <aside class="right">
-        <div class="label"><strong>旅程屬性</strong><span id="stepLabel">第 1 / 5 幕</span></div>
-        <div class="meter" id="meters">
-          <div>
-            <div class="label"><span>好奇之星</span><span id="curiosityV">3</span></div>
-            <div class="bar"><span id="curiosity"></span><div class="cap">10</div></div>
-          </div>
-          <div>
-            <div class="label"><span>洞察之光</span><span id="insightV">3</span></div>
-            <div class="bar"><span id="insight"></span><div class="cap">10</div></div>
-          </div>
-          <div>
-            <div class="label"><span>守護之種</span><span id="prepV">2</span></div>
-            <div class="bar"><span id="prep"></span><div class="cap">10</div></div>
-          </div>
-          <div>
-            <div class="label"><span>心靈暖度</span><span id="warmV">3</span></div>
-            <div class="bar"><span id="warm"></span><div class="cap">10</div></div>
-          </div>
-        </div>
-        <div class="note" style="margin-top:10px">
-          小提醒：<strong>守護之種</strong>象徵提前準備與風險意識；當旅途出現突發事件，它會像一把溫柔的傘，讓問題不至於成為災難。
-        </div>
-        <div class="tags" id="flags"></div>
-      </aside>
-    </main>
-    <footer>
-      <button class="btn ghost" id="restart" disabled>重新開始</button>
-      <div style="display:flex; gap:8px; align-items:center">
-        <button class="btn" id="back" disabled>⬅ 上一步</button>
-        <button class="btn" id="skip">快轉到結局 ⏩</button>
-      </div>
-    </footer>
-
-    <!-- 結局區 -->
-    <section class="ending" id="ending">
-      <div class="badge" id="ending-badge">結局</div>
-      <h2 id="ending-title">—</h2>
-      <p id="ending-text" class="text"></p>
-      <div class="grid-2" style="margin-top:10px">
-        <div class="recap">
-          <h3 style="margin:6px 0 8px">旅程回顧</h3>
-          <div id="recap-choices" class="text"></div>
-        </div>
-        <div class="recap">
-          <h3 style="margin:6px 0 8px">最終屬性</h3>
-          <div class="tags">
-            <span class="chip">好奇之星：<b id="rc-c"></b></span>
-            <span class="chip">洞察之光：<b id="rc-i"></b></span>
-            <span class="chip">守護之種：<b id="rc-p"></b></span>
-            <span class="chip">心靈暖度：<b id="rc-w"></b></span>
-          </div>
-          <div id="ending-gain" style="margin-top:8px"></div>
-        </div>
-      </div>
-      <div class="note" style="margin:14px 0 8px">
-        啟示：風險並不愛驚嚇人，它只是提醒我們把傘帶上。當心有所愛，準備就成了溫柔的責任。
-      </div>
-      <footer style="border-top:0; padding-top:0; justify-content:flex-end">
-        <button class="btn" onclick="engine.reset()">再玩一次 🌱</button>
-      </footer>
-    </section>
+<div class="shell">
+  <header>
+    <h1 id="title">遊戲模板</h1>
+    <div class="meta" id="subtitle"></div>
+  </header>
+  <main>
+    <div class="toolbar">
+      <span class="pill" id="genre-pill"></span>
+      <button id="btn-restart">重新開始</button>
+    </div>
+    <div id="mount"></div>
+  </main>
+  <div class="footer">
+    <div>© Template Kit</div>
+    <div id="footer-status">準備就緒</div>
   </div>
 </div>
 
-<div class="toast" id="toast">屬性變化 +1</div>
+<!-- ======== 只要改這段 CONFIG，就能快速出 4 種遊戲 ======== -->
+<script>
+const CONFIG = {
+  gameType: "puzzle", // "puzzle" | "riddle" | "story" | "relax"
+  title: "腦力小劇場",
+  subtitle: "改上面的 gameType 即可切換不同模板",
+  palette: { bg:"#0b1020", accent:"#6ad1ff" },
+  locale: "zh-TW",
+  difficulty: "normal", // "easy" | "normal" | "hard"
+  // 題庫/文本 —— 可以讓 ChatGPT 模組動態產生
+  riddleBank: [
+    { q:"什麼東西越洗越髒？", a:["水","毛巾","肥皂"], correct:1, explain:"毛巾用來擦拭，越擦越髒。" },
+    { q:"什麼門永遠關不上？", a:["車門","球門","窗門"], correct:1, explain:"球門比賽用，沒有門扇。" },
+    { q:"什麼人早上四隻腳，中午兩隻腳，晚上三隻腳？", a:["人","狗","外星人"], correct:0, explain:"嬰兒爬行、成人行走、老年拐杖。" }
+  ],
+  storyNodes: {
+    start: { text:"你在霧林醒來，口袋裡只有一張地圖與一枚銅幣。前方有兩條路：左邊月光淡藍，右邊微風清鳴。",
+      options:[ {t:"走向月光", go:"moon"}, {t:"追著清鳴", go:"wind"} ] },
+    moon: { text:"月光映出一座古井。井旁刻著：「以當下之心，換未來之安。」",
+      options:[ {t:"投入銅幣", go:"well"}, {t:"繞道離開", go:"camp"} ] },
+    wind: { text:"風帶來遠處的笑聲，是旅人的營地。",
+      options:[ {t:"前往營地", go:"camp"}, {t:"折返觀井", go:"moon"} ] },
+    well: { text:"井中傳來回響：『規劃當下，方得從容。』你獲得【從容】屬性，旅途更穩定。",
+      end:"恭喜，你以冷靜與規劃穿越迷霧，找到回家的路。" },
+    camp: { text:"營火邊的旅人分享地圖標記：『別怕改變路線，只要保留餘裕。』",
+      end:"你學會預留餘裕，旅程雖有波折卻安然抵達。" }
+  },
+  relax: {
+    cycleSec: 8, // 吸氣 4s + 吐氣 4s
+    tips: ["吸氣…","停…","吐氣…","停…"],
+    durationSec: 60
+  },
+  puzzle: {
+    symbols: ["🍀","⭐","🌙","🔥","💧","🍋","🧩","🎧","⚡","🌸"],
+  }
+};
+</script>
+<!-- ======================================================== -->
 
 <script>
-/* =============================
-   小王子：星際守護之旅
-   物件導向狀態機 + 無依賴
-   作者：故事轉互動網頁助手
-   ============================= */
+/* ===== Core Framework ===== */
+const $ = (sel, el=document)=>el.querySelector(sel);
+const mount = $("#mount");
+const setText = (id, txt)=>{ const el = document.getElementById(id); if(el) el.textContent = txt; };
+const setStatus = (txt)=> setText("footer-status", txt);
+const setGenre = (t)=> setText("genre-pill", "模式：" + t);
 
-class StoryEngine{
-  constructor(){
-    // 初始屬性（0~10）
-    this.state = {
-      step: 0,
-      attrs: { curiosity:3, insight:3, prep:2, warm:3 },
-      flags: {},           // 特殊事件記錄
-      log: []              // 選擇回顧
-    };
-    this.maxStep = scenes.length-1;
-    // 綁定 UI
-    this.ui = {
-      title: document.getElementById('scene-title'),
-      text: document.getElementById('scene-text'),
-      choices: document.getElementById('choices'),
-      stepLabel: document.getElementById('stepLabel'),
-      meters: {
-        curiosity: document.getElementById('curiosity'),
-        insight: document.getElementById('insight'),
-        prep: document.getElementById('prep'),
-        warm: document.getElementById('warm'),
-        curiosityV: document.getElementById('curiosityV'),
-        insightV: document.getElementById('insightV'),
-        prepV: document.getElementById('prepV'),
-        warmV: document.getElementById('warmV'),
-      },
-      flags: document.getElementById('flags'),
-      back: document.getElementById('back'),
-      restart: document.getElementById('restart'),
-      skip: document.getElementById('skip'),
-      spark: document.getElementById('spark'),
-      toast: document.getElementById('toast'),
-      ending: {
-        section: document.getElementById('ending'),
-        badge: document.getElementById('ending-badge'),
-        title: document.getElementById('ending-title'),
-        text: document.getElementById('ending-text'),
-        recap: document.getElementById('recap-choices'),
-        rc: {
-          c: document.getElementById('rc-c'),
-          i: document.getElementById('rc-i'),
-          p: document.getElementById('rc-p'),
-          w: document.getElementById('rc-w'),
-        },
-        gain: document.getElementById('ending-gain')
+function applyTheme(){
+  if(CONFIG.palette?.bg) document.documentElement.style.setProperty('--bg', CONFIG.palette.bg);
+  if(CONFIG.palette?.accent) document.documentElement.style.setProperty('--accent', CONFIG.palette.accent);
+  setText("title", CONFIG.title || "遊戲模板");
+  setText("subtitle", CONFIG.subtitle || "");
+}
+
+function clearMount(){ mount.innerHTML=""; }
+
+/* ====== Games ====== */
+// 1) Puzzle — 記憶翻牌
+function gamePuzzle(){
+  setGenre("益智（翻牌記憶）");
+  clearMount();
+  const wrap = document.createElement("div");
+  wrap.className = "grid";
+  const top = document.createElement("div"); top.className="card";
+  const info = document.createElement("div"); info.innerHTML = "配對成功：<b id='okc'>0</b>";
+  top.appendChild(info); wrap.appendChild(top);
+
+  const board = document.createElement("div"); board.className="board";
+  const pairs = CONFIG.difficulty==="hard"?10:CONFIG.difficulty==="easy"?6:8;
+  const pool = CONFIG.puzzle.symbols.slice(0,pairs);
+  const deck = [...pool, ...pool].sort(()=>Math.random()-0.5);
+  const state = { first:null, lock:false, matched:0 };
+  board.style.gridTemplateColumns = `repeat(${Math.sqrt(deck.length)%1?4:Math.sqrt(deck.length)}, 72px)`;
+
+  deck.forEach((sym,i)=>{
+    const t = document.createElement("button");
+    t.className="tile"; t.dataset.i=i; t.dataset.sym=sym; t.textContent="❔";
+    t.addEventListener("click", ()=>{
+      if(state.lock || t.classList.contains("revealed")) return;
+      t.classList.add("revealed"); t.textContent = sym;
+      if(!state.first){ state.first = t; return; }
+      // second
+      if(state.first.dataset.sym===t.dataset.sym && state.first!==t){
+        [state.first, t].forEach(e=>{ e.classList.add("matched"); e.style.pointerEvents="none"; });
+        state.matched++; $("#okc").textContent = state.matched;
+        if(state.matched===pairs){ setStatus("全部配對完成！"); }
+        state.first=null;
+      }else{
+        state.lock=true;
+        setTimeout(()=>{
+          [state.first, t].forEach(e=>{ e.classList.remove("revealed"); e.textContent="❔"; });
+          state.first=null; state.lock=false;
+        }, 700);
       }
-    };
-    // 事件
-    this.ui.back.addEventListener('click', ()=>this.undo());
-    this.ui.restart.addEventListener('click', ()=>this.reset());
-    this.ui.skip.addEventListener('click', ()=>this.fastToEnd());
-    this.render();
-  }
-
-  clamp(v){ return Math.max(0, Math.min(10, v)); }
-
-  applyDelta(delta){
-    // delta: {curiosity:+1, ...}, flags:{...}
-    const before = JSON.parse(JSON.stringify(this.state.attrs));
-    for(const k in delta){
-      if(k in this.state.attrs){
-        this.state.attrs[k] = this.clamp(this.state.attrs[k] + delta[k]);
-      }
-    }
-    // 顯示小火花
-    const diffs = Object.keys(this.state.attrs).map(k=>{
-      const d = this.state.attrs[k] - before[k];
-      return d!==0 ? `${attrName(k)} ${d>0?`+${d}`:d}` : null;
-    }).filter(Boolean).join('　');
-    if(diffs){
-      this.spark(`${diffs}`);
-      this.toast(`屬性更新：${diffs}`);
-    }
-  }
-
-  setFlag(name, val=true){
-    this.state.flags[name] = val;
-    this.renderFlags();
-  }
-
-  spark(text){
-    this.ui.spark.textContent = text;
-    this.ui.spark.classList.remove('show');
-    void this.ui.spark.offsetWidth;
-    this.ui.spark.classList.add('show');
-    setTimeout(()=>this.ui.spark.classList.remove('show'), 900);
-  }
-  toast(text){
-    const t = this.ui.toast;
-    t.textContent = text;
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), 1200);
-  }
-
-  pick(choice){
-    const scene = scenes[this.state.step];
-    // 記錄
-    this.state.log.push({
-      step: this.state.step,
-      title: scene.title,
-      pick: choice.title,
-      note: choice.note || "",
-      delta: choice.delta || {},
     });
-    // 應用屬性變化
-    if(choice.delta) this.applyDelta(choice.delta);
-    // 設旗標
-    if(choice.flag) this.setFlag(choice.flag, true);
-    // 下一幕或結局
-    if(this.state.step < this.maxStep){
-      this.state.step++;
-      this.render();
-    }else{
-      this.finish();
+    board.appendChild(t);
+  });
+
+  wrap.appendChild(board);
+  mount.appendChild(wrap);
+  setStatus("翻兩張找一對");
+}
+
+// 2) Riddle — 猜謎闖關
+function gameRiddle(){
+  setGenre("解謎（猜謎）");
+  clearMount();
+  const bank = CONFIG.riddleBank;
+  let idx = 0, score = 0;
+  const box = document.createElement("div"); box.className="grid";
+  const qCard = document.createElement("div"); qCard.className="card";
+  const p = document.createElement("div"); p.className="riddle-q";
+  const opts = document.createElement("div");
+
+  function render(){
+    if(idx>=bank.length){
+      box.innerHTML = `<div class="card big">完成！得分：${score}/${bank.length}</div>`;
+      mount.appendChild(box); setStatus("闖關完成"); return;
     }
-  }
-
-  undo(){
-    if(this.state.log.length===0) return;
-    // 回退到上一個決策前狀態：為確保正確，重播到倒數第二步
-    const keep = this.state.log.slice(0, -1);
-    this.reset(false);
-    for(const entry of keep){
-      this.applyDelta(entry.delta || {});
-      if(entry.flag) this.setFlag(entry.flag, true);
-      this.state.log.push(entry);
-      this.state.step++;
-    }
-    this.render();
-  }
-
-  reset(clearLog=true){
-    this.state = {
-      step: 0,
-      attrs: { curiosity:3, insight:3, prep:2, warm:3 },
-      flags: {},
-      log: []
-    };
-    document.querySelector('.ending').style.display='none';
-    document.querySelector('main').style.display='grid';
-    document.querySelector('footer').style.display='flex';
-    this.ui.restart.disabled = true;
-    this.ui.back.disabled = true;
-    this.ui.skip.disabled = false;
-    this.renderFlags();
-    this.render();
-  }
-
-  fastToEnd(){
-    // 若尚未完成，直接跳到結尾（以目前屬性計算）
-    while(this.state.step < this.maxStep){
-      // 自動選擇：偏向提升守護之種的選項
-      const choices = scenes[this.state.step].choices;
-      let c = choices.find(x=>x.delta && x.delta.prep>0) || choices[0];
-      this.state.log.push({
-        step: this.state.step, title: scenes[this.state.step].title,
-        pick: `（系統代選）${c.title}`, note: c.note||"", delta: c.delta||{}
-      });
-      if(c.delta) this.applyDelta(c.delta);
-      if(c.flag) this.setFlag(c.flag, true);
-      this.state.step++;
-    }
-    this.finish();
-  }
-
-  render(){
-    const scene = scenes[this.state.step];
-    // header
-    this.ui.title.textContent = `${scene.title}`;
-    this.ui.text.textContent = scene.text;
-    // choices
-    this.ui.choices.innerHTML = '';
-    scene.choices.forEach((c, idx)=>{
-      const div = document.createElement('button');
-      div.className = 'choice';
-      div.innerHTML = `<strong>${c.title}</strong>${c.note?`<small>${c.note}</small>`:''}`;
-      div.addEventListener('click', ()=>{ this.pick(c); this.ui.back.disabled = this.state.log.length===0; this.ui.restart.disabled=false; });
-      this.ui.choices.appendChild(div);
+    const item = bank[idx];
+    qCard.innerHTML = `<div class="riddle-q">第 ${idx+1}/${bank.length} 題：${item.q}</div>`;
+    opts.innerHTML="";
+    item.a.forEach((text, i)=>{
+      const c = document.createElement("div");
+      c.className="choice"; c.textContent = text;
+      c.onclick = ()=>{
+        const right = i===item.correct;
+        c.classList.add(right?"correct":"wrong");
+        if(right){ score++; setStatus("答對！" + (item.explain? " " + item.explain:"")); }
+        else setStatus("再想想～ " + (item.explain? "提示："+item.explain:""));
+        [...opts.children].forEach(n=>n.style.pointerEvents="none");
+        setTimeout(()=>{ idx++; render(); }, 600);
+      };
+      opts.appendChild(c);
     });
-    // meters
-    this.ui.meters.curiosity.style.width = `${this.state.attrs.curiosity*10}%`;
-    this.ui.meters.insight.style.width = `${this.state.attrs.insight*10}%`;
-    this.ui.meters.prep.style.width = `${this.state.attrs.prep*10}%`;
-    this.ui.meters.warm.style.width = `${this.state.attrs.warm*10}%`;
-    this.ui.meters.curiosityV.textContent = this.state.attrs.curiosity;
-    this.ui.meters.insightV.textContent = this.state.attrs.insight;
-    this.ui.meters.prepV.textContent = this.state.attrs.prep;
-    this.ui.meters.warmV.textContent = this.state.attrs.warm;
-    // step label
-    this.ui.stepLabel.textContent = `第 ${this.state.step+1} / ${scenes.length} 幕`;
+    box.replaceChildren(qCard, opts);
+    mount.appendChild(box);
   }
+  render();
+}
 
-  renderFlags(){
-    this.ui.flags.innerHTML = '';
-    Object.keys(this.state.flags).forEach(k=>{
-      const span = document.createElement('span');
-      span.className = 'pill';
-      span.textContent = flagLabel(k);
-      this.ui.flags.appendChild(span);
+// 3) Story — 分支敘事
+function gameStory(){
+  setGenre("劇情（分支敘事）");
+  clearMount();
+  const nodes = CONFIG.storyNodes;
+  let here = nodes.start;
+  const card = document.createElement("div"); card.className="card story";
+  function draw(){
+    if(here.end){
+      card.innerHTML = `<div>${here.text||""}</div><div class="big" style="margin-top:8px">${here.end}</div>`;
+      setStatus("故事完結");
+      mount.replaceChildren(card); return;
+    }
+    const opts = (here.options||[]).map(o=>`<button class="opt" style="margin-right:6px">${o.t}</button>`).join("");
+    card.innerHTML = `<div>${here.text||""}</div><div style="margin-top:10px">${opts}</div>`;
+    mount.replaceChildren(card);
+    [...card.querySelectorAll(".opt")].forEach((b,i)=>{
+      b.onclick=()=>{ here = nodes[here.options[i].go]; draw(); };
     });
+    setStatus("做出你的選擇");
   }
-
-  finish(){
-    // 隱藏主區、顯示結局
-    const A = this.state.attrs;
-    const F = this.state.flags;
-    const summary = decideEnding(A, F, this.state.log);
-    this.ui.ending.badge.textContent = `結局 / ${summary.code}`;
-    this.ui.ending.title.textContent = `${summary.title}`;
-    this.ui.ending.text.innerHTML = summary.text;
-    this.ui.ending.rc.c.textContent = A.curiosity;
-    this.ui.ending.rc.i.textContent = A.insight;
-    this.ui.ending.rc.p.textContent = A.prep;
-    this.ui.ending.rc.w.textContent = A.warm;
-    this.ui.ending.gain.innerHTML = summary.reward.map(s=>`<span class="chip">${s}</span>`).join('');
-    // recap
-    this.ui.ending.recap.innerHTML = this.state.log.map((e,i)=>{
-      const ds = Object.entries(e.delta||{}).map(([k,v])=>`${attrName(k)} ${v>0?`+${v}`:v}`).join('，');
-      return `<div style="margin-bottom:8px"><b>第 ${i+1} 幕｜${e.title}</b><br>你的選擇：${e.pick}${e.note?`<br><span class="muted" style="color:#6b7f6b">${e.note}</span>`:""}<br><span style="font-size:12px;color:#6b7f6b">屬性：${ds||'—'}</span></div>`;
-    }).join('');
-    document.querySelector('main').style.display='none';
-    document.querySelector('footer').style.display='none';
-    this.ui.ending.section.style.display='block';
-  }
+  draw();
 }
 
-// ===== 工具：命名與標籤 =====
-function attrName(k){
-  return {
-    curiosity:'好奇之星',
-    insight:'洞察之光',
-    prep:'守護之種',
-    warm:'心靈暖度'
-  }[k] || k;
-}
-function flagLabel(k){
-  return {
-    coveredRose:'玫瑰罩鈴保護',
-    patchedRoof:'修補屋頂',
-    compass:'得到了指北針',
-    tamedFox:'馴養了狐狸',
-    safetyKit:'編織應變包',
-    sandAnchor:'風繩固定飛行器'
-  }[k] || k;
-}
+// 4) Relax — 呼吸節奏
+function gameRelax(){
+  setGenre("舒壓（呼吸引導）");
+  clearMount();
+  const wrap = document.createElement("div"); wrap.className="center grid";
+  const bubble = document.createElement("div"); bubble.className="bubble center";
+  const caption = document.createElement("div"); caption.className="hint"; caption.textContent="跟著圓球放大縮小吸吐氣";
+  wrap.append(bubble, caption); mount.appendChild(wrap);
 
-// ===== 劇情（標準版：每段約 250–350 字） =====
-const scenes = [
-  {
-    title: "第一幕・B612 的抉擇",
-    text:
-      "雲影壓低，小王子知道離別總有風聲。他看著玻璃罩與玫瑰，那朵自矜又脆弱的花說自己不怕。火山口還未清，屋頂也在上次流星雨後留下一道細縫。他想啟程去拜訪新的星球，心中卻有一粒細小的擔憂：如果風在他離開時變大，玫瑰會不會著涼？他翻出一塊輕薄的罩鈴與幾根繩子，還有寫滿塗鴉的星圖小冊。旅途需要勇氣，也需要照料未來可能發生的事。",
-    choices:[
-      { title:"先為玫瑰套上罩鈴，再整理三座火山", note:"出發前的細心，讓思念不被擔心吵醒。", delta:{prep:+2, insight:+1, warm:+1}, flag:'coveredRose' },
-      { title:"立刻啟程，讓風帶路", note:"把不安交給星光，帶著單純前行。", delta:{curiosity:+2, warm:+0} },
-      { title:"向鄰近的小衛星求助，確認天氣與風向", note:"願意問路的人會少走彎路。", delta:{insight:+2, warm:+1} }
-    ]
-  },
-  {
-    title: "第二幕・國王的屋頂",
-    text:
-      "第一站是自稱統御萬物的國王星。國王披著拖地的斗篷，對小王子說：『我命令風必須溫柔。』然而角落的屋頂裂縫在嘶嘶作響，侍從忙著舉權杖，卻沒人去補瓦。小王子想起自己行星的那道縫，理解到聲音再大也擋不住雨水。國王邀他成為『大臣』，負責讚嘆每一個命令；星空很美，但更美的是能讓明天不漏水的手。",
-    choices:[
-      { title:"向國王婉轉建議：先修屋頂再講命令", note:"看見表面之外，才是光。", delta:{insight:+2, prep:+1}, flag:'patchedRoof' },
-      { title:"接受頭銜，學習威儀與禮節", note:"禮節讓人靠近，但不一定擋雨。", delta:{warm:+1, curiosity:+1} },
-      { title:"自己動手補瓦，以行動作為勸告", note:"有時沉默的手比話語響亮。", delta:{prep:+2, warm:+1}, flag:'patchedRoof' }
-    ]
-  },
-  {
-    title: "第三幕・數星的商人",
-    text:
-      "下一顆星球住著一位忙碌的商人。他用帳冊圈住每一顆星，說那都是自己的財產。小王子問：『你擁有它們，就會更懂得它們嗎？』商人搖頭，只說擁有讓他安心。桌上有一枚舊指北針與一壺水，角落堆著落滿灰的冒險手冊。小王子想，真正能帶路的，或許不是標價，而是願意面對未知時的一點準備與一份分享。",
-    choices:[
-      { title:"交換：把自己的星圖抄給商人，換取指北針", note:"工具不是膽量，但能讓膽量走得更遠。", delta:{prep:+2, insight:+1}, flag:'compass' },
-      { title:"陪商人一起數星，練習耐心", note:"靜下來，也是一種旅行。", delta:{warm:+1, curiosity:+1, insight:+1} },
-      { title:"把水分給口渴的旅人，請他分享穿越沙區的技巧", note:"分享讓路更清楚。", delta:{warm:+2, insight:+1, prep:+1} }
-    ]
-  },
-  {
-    title: "第四幕・狐狸的邀請",
-    text:
-      "一片麥田邊，狐狸向他點頭：『請馴養我吧。』馴養需要時間，也需要承諾。狐狸說，風起時，麥浪像金色的海；危險來時，洞穴要先清好、路標要插穩。小王子想起玫瑰與遠行，也想起那些不期而至的暴風。他可以選擇學習狐狸的規矩，或追逐天邊的流星，讓心只有奔跑的方向而沒有歇息的棲木。",
-    choices:[
-      { title:"接受馴養儀式，學習『相見的時間』與『離別的準備』", note:"關係讓世界有了重量。", delta:{warm:+2, insight:+1, prep:+1}, flag:'tamedFox' },
-      { title:"追逐流星，收集故事", note:"故事會發光，但也會忘記回家的路。", delta:{curiosity:+2} },
-      { title:"跟狐狸一起編織簡易應變包與訊號旗", note:"當心有所愛，就會想把風收進袋子。", delta:{prep:+3, insight:+1}, flag:'safetyKit' }
-    ]
-  },
-  {
-    title: "第五幕・沙海與風繩",
-    text:
-      "穿越沙漠，他遇見迷途的飛行員。黃沙忽然升起，像巨大的獸在地平線奔跑。小王子想起口袋裡的指北針、狐狸教的旗語，還有在自家行星學會的那份不慌。他知道現在每一個決定，都會讓故事往不同方向延伸：或是急著啟航，被風推翻；或是先把風繩固定，再談路線；或是向星光求助，讓夜空成為可靠的地圖。",
-    choices:[
-      { title:"先用繩索把飛行器與石錘固定，再尋找背風處", note:"先安，再談遠方。", delta:{prep:+3, insight:+1}, flag:'sandAnchor' },
-      { title:"趁風勢未滿立刻起飛", note:"有時快一步，也可能少看一步。", delta:{curiosity:+2, prep:-1} },
-      { title:"夜待群星，利用指北針與旗語校對航線", note:"慢下來，讓光對準。", delta:{insight:+2, prep:+1} }
-    ]
-  }
-];
-
-// ===== 結局判定 =====
-function decideEnding(A, F, log){
-  const total = A.curiosity + A.insight + A.prep + A.warm;
-
-  // 隱藏結局：守護之種高，且至少兩個關鍵準備旗標
-  const keyPrep = ['coveredRose','patchedRoof','compass','safetyKit','sandAnchor'];
-  const prepFlags = keyPrep.filter(k=>F[k]).length;
-
-  // 1) 隱藏 — 時光的庇護
-  if(A.prep>=8 && prepFlags>=2 && F.tamedFox){
-    return {
-      code:"E5",
-      title:"⏳ 時光的庇護",
-      text:
-        "風暴終究來過，卻像被溫柔地請到屋外。飛行器穩穩落在背風的谷地，狐狸教的旗語在沙丘上閃耀。遠方的玫瑰在罩鈴下安睡，小王子把寫著路標的頁角摺好，與飛行員並肩看天亮。原來『預先的照料』會悄悄為明天墊一層軟墊，讓意外成為故事，而不是傷痕。他得到的不是勝利，而是一種能分享給他人的安定。",
-      reward:["稱號：靜好的守望者","技能：提前鋪路","加成：突發狀況減傷"],
-    };
-  }
-
-  // 2) 理想 — 繁星守望者：四項相對平衡且 prep>=6
-  const balanced = [A.curiosity,A.insight,A.prep,A.warm];
-  const spread = Math.max(...balanced) - Math.min(...balanced);
-  if(spread<=3 && A.prep>=6 && A.insight>=5){
-    return {
-      code:"E1",
-      title:"✨ 繁星守望者",
-      text:
-        "旅程在黎明收束。你修了屋頂、也學會向人請教；你仍熱愛未知，卻懂得先把風繩綁好。狐狸在麥浪中打滾，玫瑰在罩鈴下打盹。小王子知道：準備不是懷疑明天，而是讓明天有機會更溫柔。於是他把指北針送給飛行員，讓彼此的路都更清楚。",
-      reward:["稱號：繁星守望者","技能：平衡抉擇","特性：風險轉化為經驗"]
-    };
-  }
-
-  // 3) 專業成功但人際疏離 — 孤行的旅者：高洞察高準備但低暖度
-  if(A.insight>=7 && A.prep>=6 && A.warm<=4){
-    return {
-      code:"E2",
-      title:"🌌 孤行的旅者",
-      text:
-        "你預測風向，也讀懂沙海的紋理。飛行器安全穿越，可是道別總是簡短。狐狸在遠方望著你，玫瑰也學會不再抱怨。你確實把危險化為小事，卻也讓心變得輕不勝重。小王子明白了：準備固然重要，若少了彼此，抵達就像空蕩的星港。",
-      reward:["稱號：影中行者","技能：風向判讀","提醒：關係需要時間"]
-    };
-  }
-
-  // 4) 和諧結局 — 花園的守護人：高暖度、關係旗標，哪怕目標未盡
-  if(A.warm>=7 && (F.tamedFox || F.coveredRose)){
-    return {
-      code:"E3",
-      title:"🌿 花園的守護人",
-      text:
-        "你為玫瑰披上罩鈴，也按狐狸的節奏相會。風暴來時，你願意停下腳步與人同避。或許旅程因此慢了一些；可麥田更金、夜色更近。小王子懂得，守護並不是不去遠方，而是讓重要的事物在遠方也能被好好照料。",
-      reward:["稱號：花園的守護人","技能：陪伴與照應","天賦：共享與互助"]
-    };
-  }
-
-  // 5) 壞結局 — 流星的遺憾：準備過低或倉促冒進
-  if(A.prep<=3 || (A.curiosity>=7 && A.prep<=4 && !F.sandAnchor)){
-    return {
-      code:"E4",
-      title:"💫 流星的遺憾",
-      text:
-        "你選擇追著風跑，故事燦爛卻短得像一顆劃過的流星。沙牆在半空翻卷，飛行器被迫降；遠方的罩鈴也在風中叮噹。那一刻，小王子第一次懂得：勇敢並不反對準備，沒有繩結的熱情，會把想守護的東西一併吹散。",
-      reward:["稱號：風中拾光者","教訓：速度不等於方向","提示：讓『守護之種』先發芽"]
-    };
-  }
-
-  // 兜底：依總分與傾向
-  if(total>=24) {
-    return {
-      code:"E1*",
-      title:"✨ 繁星守望者",
-      text:
-        "你把遠方與近處綁在一起：既不損熱情，也不忘準備。風在背後推著你，而非把你推倒。小王子學會把每一次出發，變成對明天的照料。",
-      reward:["稱號：繁星守望者","技能：平衡抉擇"]
-    };
-  }else{
-    return {
-      code:"E4*",
-      title:"💫 流星的遺憾",
-      text:
-        "旅途雖美，卻被幾陣意外打得零散。你看見了風暴的脾氣，也看見了準備的重量。下次，記得先把風繩綁緊，再追流星。",
-      reward:["稱號：風的學徒","提示：提早鋪墊，換來從容"]
-    };
-  }
+  const total = CONFIG.relax.durationSec||60;
+  const step = (CONFIG.relax.cycleSec||8)/2; // 簡化：吸4s/吐4s
+  let t = 0, grow=true;
+  const timer = setInterval(()=>{
+    t += 0.1;
+    const scale = grow ? 1 + (t%step)/step*0.3 : 1.3 - (t%step)/step*0.3;
+    bubble.style.transform = `scale(${scale})`;
+    if(Math.floor(t)%step===0 && Math.abs((t%step)-0)<0.11){ grow=!grow; caption.textContent = grow? "吸氣…" : "吐氣…"; }
+  }, 100);
+  setTimeout(()=>{ clearInterval(timer); caption.textContent="完成一輪放鬆！"; setStatus("結束"); }, total*1000);
 }
 
-// ====== 啟動 ======
-const engine = new StoryEngine();
-
-// ========== 內容安全：防止未定義錯誤 ==========
-window.addEventListener('error', (e)=>{
-  console.warn('捕捉到錯誤：', e.message);
-});
-
+/* ===== Router ===== */
+function start(){
+  applyTheme();
+  setText("subtitle", CONFIG.subtitle||"");
+  $("#btn-restart").onclick = start;
+  const map = { puzzle:gamePuzzle, riddle:gameRiddle, story:gameStory, relax:gameRelax };
+  (map[CONFIG.gameType]||gamePuzzle)();
+}
+start();
 </script>
 </body>
 </html>
